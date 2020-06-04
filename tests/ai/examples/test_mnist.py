@@ -19,8 +19,8 @@ class_names = ['T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat',
 
 num_train_examples = metadata.splits['train'].num_examples
 num_test_examples = metadata.splits['test'].num_examples
-print("训练样本个数: {}".format(num_train_examples))
-print("测试样本个数:{}".format(num_test_examples))
+print("Training Samples Count: {}".format(num_train_examples))
+print("Testing Samples Count:{}".format(num_test_examples))
 
 def normalize(images,labels): #定义标准化函数
   images = tf.cast(images,tf.float32)
