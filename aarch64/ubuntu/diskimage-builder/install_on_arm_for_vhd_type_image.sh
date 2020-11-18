@@ -1,8 +1,8 @@
-# Base repo load
-apt install vim -y
-curl https://repogen.simplylinux.ch/txt/xenial/sources_dce40f508e412c2a0ea584c2150c0fd3111c0b6b.txt| tee /etc/apt/sources.list
-apt update
-wget -O /etc/apt/sources.list https://repo.huaweicloud.com/repository/conf/Ubuntu-Ports-xenial.list
+# Base repo load for ubuntu 1604
+#apt install vim -y
+#curl https://repogen.simplylinux.ch/txt/xenial/sources_dce40f508e412c2a0ea584c2150c0fd3111c0b6b.txt| tee /etc/apt/sources.list
+#apt update
+#wget -O /etc/apt/sources.list https://repo.huaweicloud.com/repository/conf/Ubuntu-Ports-xenial.list
 
 
 # Config the dib env
@@ -23,6 +23,8 @@ chmod 600 /root/zuul-key/id_rsa.pub
 export DIB_DEV_USER_USERNAME=zuul
 export DIB_DEV_USER_PWDLESS_SUDO=yes
 export DIB_DEBIAN_COMPONENTS='main,universe'
+export DIB_DEV_USER_AUTHORIZED_KEYS=/root/zuul-key/id_rsa.pub
+
 
 # install dib
 cd diskimage-builder/
@@ -31,7 +33,8 @@ cd /opt/
 
 
 # install vhd-util from apt repo but might failed
-apt-get install -y blktap-utils squashfs-tools kpartx qemu-utils
+apt-get install -y squashfs-tools kpartx qemu-utils
+# apt-get install -y blktap-utils
 which vhd-util
 
 
@@ -39,6 +42,8 @@ which vhd-util
 cd /opt/
 git clone https://github.com/emonty/vhd-util.git
 cd vhd-util
+git config --global user.email "you@example.com"
+git config --global user.name "Your Name"
 git apply debian/patches/citrix
 git status
 git add .
@@ -53,16 +58,20 @@ cd /opt/
 git clone git://xenbits.xen.org/xen.git
 cd xen/
 apt-get install -y texinfo gettext iasl
-apt-get install libtool lib32ncurses5-dev -y
 apt-get install libtool libncurses5-dev -y
 apt-get install -y pkg-config
 apt install libglib2.0-dev -y
 apt install libyajl-dev libpixman-1.dev -y
-apt install libfdt -y
 apt install libfdt-dev -y
+#################  X86
+apt install -y bcc lzma lzma-dev liblzma-dev
+# REF: https://libvmi.wordpress.com/2015/01/23/libvmi-xen-setup/
+# REF: https://gist.github.com/cnlelema/5f14675364a47c6ffa7e34bb6d3ad470
+#######################################
 ./configure
 make world
 make install
+bash -x ./install.sh
 which xen
 
 # install vhd-util fixed binary
@@ -71,7 +80,10 @@ cd vhd-util/
 apt install libaio1  -y
 apt install libaio-dev  -y
 ./configure --prefix=/opt/vhd-install/ --host=arm --build=arm --target=arm
-make
+#################  X86
+#CFLAGS="-Wno-error -Wno-int-in-bool-context -Wno-array-bounds -Wno-maybe-uninitialized -Wno-misleading-indentation -Wno-unused-const-variable -Wno-format-overflow" ./configure --prefix=/opt/vhd-install/
+#######################################
+make -j
 make install
 bash -x ./install.sh
 which vhd-utls
@@ -80,7 +92,8 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt//vhd-install/lib
 export PATH=$PATH:/opt//vhd-install/bin:/opt//vhd-install/sbin
 vhd-util --help
 
-# Build image
+# Build arm image
 cd /opt/
 disk-image-create -a arm64 -o ubuntu-bionic-arm64.vhd -t vhd -x -u ubuntu vm simple-init growroot devuser openssh-server
-
+# Build X86 image
+#disk-image-create -a amd64 -o ubuntu-bionic-amd64.vhd -t vhd -x -u ubuntu vm simple-init growroot devuser openssh-server
