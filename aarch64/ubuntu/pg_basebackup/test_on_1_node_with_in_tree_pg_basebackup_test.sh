@@ -45,6 +45,12 @@ cd postgres
 make -j
 make install
 
+## Fix 
+#pg@pg-test:~/postgres/src/bin/pg_basebackup$ pg_recvlogical -S test -d postgres --create-slot
+#pg_recvlogical: error: could not send replication command "CREATE_REPLICATION_SLOT "test" LOGICAL "test_decoding" NOEXPORT_SNAPSHOT": ERROR:  could not access file "test_decoding": No such file or directory
+cd contrib/test_decoding/
+make all
+cp test_decoding.so `pg_config --pkglibdir`
 
 export PGDATA=$HOME/pgsql-install/data
 export LD_LIBRARY_PATH=$HOME/pgsql-install/lib:$LD_LIBRARY_PATH
@@ -52,7 +58,18 @@ export PATH=$PATH:$HOME/pgsql-install/bin/
 which psql
 psql --version
 
+initdb --pgdata=$PGDATA --encoding=UTF8
+## Fix
+# pg@pg-test:~/postgres/src/bin/pg_basebackup$ pg_recvlogical -S test -d postgres --create-slot
+# pg_recvlogical: error: could not send replication command "CREATE_REPLICATION_SLOT "test" LOGICAL "test_decoding" NOEXPORT_SNAPSHOT": ERROR:  logical decoding requires wal_level >= logical
+cat <<EOF >> $PGDATA/postgresql.conf
+wal_level = logical
+EOF
 
+pg_ctl -D $PGDATA -l $PGDATA/logfile start
+
+cd src/bin/pg_basebackup
+make installcheck
 
 #####
 ## ENV
@@ -65,6 +82,3 @@ export LD_LIBRARY_PATH=$HOME/pgsql-install/lib:$LD_LIBRARY_PATH
 export PATH=$PATH:$HOME/pgsql-install/bin/
 which psql
 psql --version
-
-cd src/bin/pg_basebackup/
-make installcheck
