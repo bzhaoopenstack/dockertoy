@@ -45,6 +45,11 @@ cd ~/code-unpatched/postgres
 cd
 
 export PATH=$PATH:$HOME/pg-install-unpatched/bin
+export PGSQL_BASE_DIR=$HOME/pg-install-unpatched/
+export PG_USER=pgsql
+# for pgbench, before running it, you need to exec "pgbench -i" to init the test tables or constructions.
+pgbench -i arm
+# for sysbench, you need to install the latest sysbench package, do not use apt install to install the sysbench.
 which psql
 psql --version
 mkdir -p $HOME/pgdata-unpatched
@@ -59,6 +64,11 @@ createdb -O pgsql pgsql
 cd ~/code-patched/postgres
 ./configure --prefix=$HOME/pg-install-patched/ ; make -j ; make install
 export PATH=$PATH:$HOME/pg-install-patched/bin
+export PGSQL_BASE_DIR=$HOME/pg-install-patched/
+export PG_USER=pgsql
+# for pgbench, before running it, you need to exec "pgbench -i" to init the test tables or constructions.
+pgbench -i arm
+# for sysbench, you need to install the latest sysbench package, do not use apt install to install the sysbench.
 which psql
 psql --version
 mkdir -p $HOME/pgdata-patched
