@@ -32,12 +32,14 @@ cd
 git clone https://github.com/mysqlonarm/benchmark-suites.git
 ls
 
-mkdir code
-cd code
+mkdir code-base
+cd code-base
 git clone https://github.com/postgres/postgres.git
 mkdir ~/code-patched
+mkdir ~/code-unpatched
 cp -rf ./postgres ~/code-patched/
-cd postgres
+cp -rf ./postgres ~/code-unpatched/
+cd ~/code-unpatched/postgres
 ./configure --prefix=$HOME/pg-install-unpatched/ ; make -j ; make install
 
 cd
