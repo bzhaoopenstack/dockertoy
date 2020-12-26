@@ -29,21 +29,39 @@ echo "pgsql ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 ## pguser
 cd
+git clone https://github.com/mysqlonarm/benchmark-suites.git
+ls
+
 mkdir code
 cd code
 git clone https://github.com/postgres/postgres.git
+mkdir ~/code-patched
+cp -rf ./postgres ~/code-patched/
 cd postgres
-./configure --prefix=$HOME/pg-install/ ; make -j ; make install
+./configure --prefix=$HOME/pg-install-unpatched/ ; make -j ; make install
+
 cd
-git clone https://github.com/mysqlonarm/benchmark-suites.git
-ls
-cd benchmark-suites/
-export PATH=$PATH:$HOME/pg-install/bin
+
+export PATH=$PATH:$HOME/pg-install-unpatched/bin
 which psql
 psql --version
-mkdir -p $HOME/pgdata
-initdb --pgdata=$HOME/pgdata --encoding=UTF8
-pg_ctl -D $HOME/pgdata -l $HOME/logfile start
+mkdir -p $HOME/pgdata-unpatched
+initdb --pgdata=$HOME/pgdata-unpatched --encoding=UTF8
+pg_ctl -D $HOME/pgdata-unpatched -l $HOME/logfile-unpatched start
+createdb -O pgsql psql
+createdb -O pgsql arm
+createdb -O pgsql postgres || true
+createdb -O pgsql pgsql
+./vm.sh
+
+cd ~/code-patched/postgres
+./configure --prefix=$HOME/pg-install-patched/ ; make -j ; make install
+export PATH=$PATH:$HOME/pg-install-patched/bin
+which psql
+psql --version
+mkdir -p $HOME/pgdata-patched
+initdb --pgdata=$HOME/pgdata-patched --encoding=UTF8
+pg_ctl -D $HOME/pgdata-patched -l $HOME/logfile-patched start
 createdb -O pgsql psql
 createdb -O pgsql arm
 createdb -O pgsql postgres || true
