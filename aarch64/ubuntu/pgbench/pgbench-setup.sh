@@ -91,6 +91,20 @@ export PGSQL_BASE_DIR=$HOME/pg-install-unpatched/
 
 # ./configure --with-mysql-includes=$HOME/pg-install-unpatched/include --with-mysql-libs=$HOME/pg-install-unpatched/lib/ --prefix=$HOME/sysbench-install-unpatched/ --with-mysql
 
+# [pgsql@test-pg pgsql-sbench]$ cat load-data/load-data.sh
+##!/bin/bash
+
+# threads is based on number of cpus
+#THDS=`nproc`
+
+#sysbench --threads=$THDS --rate=0 --report-interval=1 --db-driver=pgsql \
+#         --pgsql-host=$PGSQL_HOST --pgsql-port=$PGSQL_PORT --pgsql-db=$PGSQL_DB \
+#         --pgsql-user=$PGSQL_USER --pgsql-password=$PGSQL_PASSWD \
+#         $SYSBENCH_LUA_SCRIPT_LOCATION/oltp_insert.lua --tables=$TABLES --table-size=$TABLE_SIZE prepare
+#[pgsql@test-pg pgsql-sbench]$ sysbench --threads=24 --time=120 --rate=0 --report-interval=5 --db-driver=pgsql --rand-type=uniform --pgsql-host=localhost --pgsql-port=5432 --pgsql-db=arm --pgsql-user=pgsql --pgsql-password="" /usr/share/sysbench/oltp_read_only.lua --tables=50 --table-size=1500000 run
+#[pgsql@test-pg pgsql-sbench]$ sysbench --threads=24 --rate=0 --report-interval=1 --db-driver=pgsql --pgsql-host=localhost --pgsql-port=5432 --pgsql-db=arm --pgsql-user=pgsql --pgsql-password="" /usr/share/sysbench/oltp_insert.lua --tables=50 --table-size=1500000 prepare
+
+
 cd ~/code-patched/postgres
 ./configure --prefix=$HOME/pg-install-patched/ ; make -j ; make install
 export PATH=$PATH:$HOME/pg-install-patched/bin
