@@ -84,6 +84,10 @@ export PGSQL_BASE_DIR=$HOME/pg-install-unpatched/
 #	make install
 # export PATH=$PATH:$HOME/sysbench-install-unpatched/bin/
 
+# install sysybench deps
+# yum -y install postgresql-devel
+# sudo ln -s ~/sysbench-install-unpatched/share/sysbench/ /usr/share/sysbench
+# export PATH=/home/pgsql/pg-install-unpatched/bin:/home/pgsql/sysbench-install-unpatched/bin/:/home/pgsql/.local/bin:/home/pgsql/bin:/usr/local/bin:/usr/bin
 
 # ./configure --with-mysql-includes=$HOME/pg-install-unpatched/include --with-mysql-libs=$HOME/pg-install-unpatched/lib/ --prefix=$HOME/sysbench-install-unpatched/ --with-mysql
 
