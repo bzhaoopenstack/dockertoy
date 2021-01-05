@@ -36,6 +36,15 @@ cd
 git clone https://github.com/mysqlonarm/benchmark-suites.git
 ls
 
+# sysbench
+#cd && \
+#    git clone https://github.com/akopytov/sysbench.git && \
+#	cd sysbench && \
+#	./autogen.sh && \
+#	./configure --with-mysql-includes=/home/mysql-master/mysql/include --with-mysql-libs=/home/mysql-master/mysql/lib/ --prefix=/home/sysbench-install/ && \
+#	make -j && \
+#	make install
+
 mkdir code-base
 cd code-base
 git clone https://github.com/postgres/postgres.git
