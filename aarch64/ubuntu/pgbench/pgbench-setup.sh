@@ -69,10 +69,14 @@ initdb --pgdata=$HOME/pgdata-unpatched --encoding=UTF8
 pg_ctl -D $HOME/pgdata-unpatched -l $HOME/logfile-unpatched start
 createdb -O pgsql psql
 createdb -O pgsql arm
+# X86
+# createdb -O pgsql x86
 createdb -O pgsql postgres || true
 createdb -O pgsql pgsql
 # for pgbench, before running it, you need to exec "pgbench -i" to init the test tables or constructions.
 pgbench -i arm
+# X86
+# pgbench -i x86
 
 cd ~/benchmark-suites/pgsql-pbench
 export PGSQL_BASE_DIR=$HOME/pg-install-unpatched/
@@ -92,10 +96,14 @@ initdb --pgdata=$HOME/pgdata-patched --encoding=UTF8
 pg_ctl -D $HOME/pgdata-patched -l $HOME/logfile-patched start
 createdb -O pgsql psql
 createdb -O pgsql arm
+# X86
+# createdb -O pgsql x86
 createdb -O pgsql postgres || true
 createdb -O pgsql pgsql
 # for pgbench, before running it, you need to exec "pgbench -i" to init the test tables or constructions.
 pgbench -i arm
+# X86
+# pgbench -i x86
 cd ~/benchmark-suites/pgsql-pbench
 export PGSQL_BASE_DIR=$HOME/pg-install-patched/
 ./vm.sh
