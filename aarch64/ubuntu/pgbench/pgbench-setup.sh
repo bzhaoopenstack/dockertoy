@@ -36,15 +36,6 @@ cd
 git clone https://github.com/mysqlonarm/benchmark-suites.git
 ls
 
-# sysbench
-#cd && \
-#    git clone https://github.com/akopytov/sysbench.git && \
-#	cd sysbench && \
-#	./autogen.sh && \
-#	./configure --with-mysql-includes=/home/mysql-master/mysql/include --with-mysql-libs=/home/mysql-master/mysql/lib/ --prefix=/home/sysbench-install/ && \
-#	make -j && \
-#	make install
-
 mkdir code-base
 cd code-base
 git clone https://github.com/postgres/postgres.git
@@ -81,6 +72,20 @@ pgbench -i arm
 cd ~/benchmark-suites/pgsql-pbench
 export PGSQL_BASE_DIR=$HOME/pg-install-unpatched/
 ./vm.sh
+
+
+# sysbench
+#cd && \
+#    git clone https://github.com/akopytov/sysbench.git && \
+#	cd sysbench && \
+#	./autogen.sh && \
+#	./configure --with-pgsql-includes=$HOME/pg-install-unpatched/include --with-pgsql-libs=$HOME/pg-install-unpatched/lib/ --prefix=$HOME/sysbench-install-unpatched/ --with-pgsql --without-mysql && \
+#	make -j && \
+#	make install
+# export PATH=$PATH:$HOME/sysbench-install-unpatched/bin/
+
+
+# ./configure --with-mysql-includes=$HOME/pg-install-unpatched/include --with-mysql-libs=$HOME/pg-install-unpatched/lib/ --prefix=$HOME/sysbench-install-unpatched/ --with-mysql
 
 cd ~/code-patched/postgres
 ./configure --prefix=$HOME/pg-install-patched/ ; make -j ; make install
