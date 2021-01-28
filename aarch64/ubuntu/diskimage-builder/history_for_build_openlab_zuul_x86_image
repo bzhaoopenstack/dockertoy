@@ -1,0 +1,161 @@
+  - name: ubuntu-focal
+#    rebuild-age: 172800 # 2 days
+    pause: false
+    elements:
+      - ubuntu
+      - vm
+      - simple-init
+      - nodepool-base
+      - cache-devstack
+      - initialize-urandom
+      - growroot
+      - infra-package-needs
+    release: focal
+    env-vars:
+      TMPDIR: /opt/dib_tmp
+      DIB_CHECKSUM: '1'
+      DIB_IMAGE_CACHE: /opt/dib_cache
+      DIB_APT_LOCAL_CACHE: '0'
+      DIB_DISABLE_APT_CLEANUP: '1'
+      DIB_GRUB_TIMEOUT: '0'
+      DIB_DEBIAN_COMPONENTS: 'main,universe'
+      DIB_CUSTOM_PROJECTS_LIST_URL: 'file:///etc/projectname/repos.yaml'
+      DIB_DEV_USER_PWDLESS_SUDO: '1'
+      DIB_CLOUD_INIT_DATASOURCES: 'ConfigDrive, OpenStack'
+      GIT_HTTP_LOW_SPEED_TIME: '300'
+      GIT_HTTP_LOW_SPEED_LIMIT: '1000'
+      ZUUL_USER_SSH_PUBLIC_KEY: '/var/lib/projectname/.ssh/id_rsa.pub'
+
+# MASTER NODE
+# openstack --os-cloud citynetwork server create test1 --flavor 16C-32GB-100GB --image official-ubuntu-bionic --network d0d972fa-6e89-4605-a9ff-57a520e13750
+
+##################################################################
+
+# BUILD NODE
+# login user ubntu
+cd
+sudo apt update
+git clone https://git.openstack.org/openstack/diskimage-builder
+cd diskimage-builder
+
+# Fix ImportError: No module named yaml
+sudo pip install -r requirements.txt
+
+sudo pip3 install -r requirements.txt
+sudo python3 setup.py install
+sudo apt install -y qemu kpartx
+
+mkdir -p /home/ubuntu/dib_tmp
+mkdir -p /home/ubuntu/dib_cache
+
+# Fix sudo unknow hostname ubuntu
+# Change /etc/hosts with ubuntu after 127.0.0.1 localhost ubuntu
+
+# See for reference
+# https://blog.51cto.com/yuweibing/2133762
+
+# copy the repos.yaml from /etc/nodepool/repos.yaml
+# export DIB_CUSTOM_PROJECTS_LIST_URL='file:///home/ubuntu/repos.yaml'
+
+# copy the zuul private key
+# export DIB_DEV_USER_AUTHORIZED_KEYS=/home/ubuntu/id_rsa.pub
+# export ZUUL_USER_SSH_PUBLIC_KEY=/home/ubuntu/id_rsa.pub
+# chmod 600 /home/ubuntu/id_rsa.pub
+
+# copy the elements from the master env
+# scp -r -i zuul.pem /etc/nodepool zuul@192.168.0.40:/home/ubuntu/
+# export ELEMENTS_PATH=/home/zubuntu/nodepool/elements/
+
+export TMPDIR=/home/ubuntu/dib_tmp
+export DIB_CHECKSUM='1'
+export DIB_IMAGE_CACHE=/home/ubuntu/dib_cache
+export DIB_APT_LOCAL_CACHE='0'
+export DIB_DISABLE_APT_CLEANUP='1'
+export DIB_GRUB_TIMEOUT='0'
+export DIB_DEBIAN_COMPONENTS='main,universe'
+export DIB_CUSTOM_PROJECTS_LIST_URL='file:///home/ubuntu/repos.yaml'
+export DIB_DEV_USER_PWDLESS_SUDO='1'
+export DIB_CLOUD_INIT_DATASOURCES='ConfigDrive, OpenStack'
+export GIT_HTTP_LOW_SPEED_TIME='300'
+export GIT_HTTP_LOW_SPEED_LIMIT='1000'
+export DIB_DEV_USER_USERNAME=zuul
+export DIB_DEV_USER_AUTHORIZED_KEYS=/home/ubuntu/id_rsa.pub
+export ZUUL_USER_SSH_PUBLIC_KEY=/home/ubuntu/id_rsa.pub
+export DIB_RELEASE=focal
+export DIB_SHOW_IMAGE_USAGE=1
+
+# copy the elements from the master env
+export ELEMENTS_PATH=/home/ubuntu/nodepool/elements/
+
+# disk-image-create -a amd64 -o ubuntu-$DIB_RELEASE-amd64.qcow2 -t qcow2 -x -u ubuntu vm simple-init growroot devuser nodepool-base cache-devstack initialize-urandom growroot infra-package-needs zuul-worker
+disk-image-create -a amd64 -o ubuntu-$DIB_RELEASE-amd64.qcow2 -t qcow2 -x -u ubuntu vm simple-init growroot nodepool-base cache-devstack initialize-urandom growroot infra-package-needs zuul-worker
+
+
+# MASTER node
+DIB_RELEASE=focal
+scp -r -i zuul.pem zuul@192.168.0.9:/home/ubuntu//diskimage-builder/ubuntu-$DIB_RELEASE-amd64.qcow2 . ; scp -r -i zuul.pem zuul@192.168.0.9:/home/ubuntu//diskimage-builder/ubuntu-$DIB_RELEASE-amd64.qcow2.md5 . ; scp -r -i zuul.pem zuul@192.168.0.9:/home/ubuntu//diskimage-builder/ubuntu-$DIB_RELEASE-amd64.qcow2.sha256 . ; scp -r -i zuul.pem zuul@192.168.0.9:/home/ubuntu//diskimage-builder/ubuntu-$DIB_RELEASE-amd64.d .
+
+
+# Test on master node
+openstack --os-cloud citynetwork image create openlab-ubuntu-focal --disk-format qcow2 --file ./ubuntu-focal-amd64.qcow2
+
+openstack --os-cloud citynetwork server create test2 --flavor 4C-8GB-100GB --image openlab-ubuntu-focal --network d0d972fa-6e89-4605-a9ff-57a520e13750
+
+
+
+
+# Remove on-found packge and remove pip and python2 stuff
+# ERROR:
+# 2021-01-27 08:16:55.903 | + set -eu
+# 2021-01-27 08:16:55.903 | + set -o pipefail
+# 2021-01-27 08:16:55.904 | + [[ ubuntu =~ (opensuse|fedora|centos|centos7|rhel|rhel7) ]]
+# 2021-01-27 08:16:55.904 | + [[ ubuntu = gentoo ]]
+# 2021-01-27 08:16:55.904 | + packages='python-pip python3-pip python-virtualenv'
+# 2021-01-27 08:16:55.904 | + [[ 3 == 3 ]]
+# 2021-01-27 08:16:55.904 | + packages+=' python3-virtualenv'
+# 2021-01-27 08:16:55.904 | + apt-get -y install python-pip python3-pip python-virtualenv python3-virtualenv
+# 2021-01-27 08:16:55.970 | Reading package lists...
+# 2021-01-27 08:16:56.146 | Building dependency tree...
+# 2021-01-27 08:16:56.147 | Reading state information...
+# 2021-01-27 08:16:56.166 | Package python-virtualenv is not available, but is referred to by another package.
+# 2021-01-27 08:16:56.166 | This may mean that the package is missing, has been obsoleted, or
+# 2021-01-27 08:16:56.166 | is only available from another source
+# 2021-01-27 08:16:56.166 |
+# 2021-01-27 08:16:56.262 | E: Unable to locate package python-pip
+# 2021-01-27 08:16:56.262 | E: Package 'python-virtualenv' has no installation candidate
+# vi /home/ubuntu/diskimage-builder/diskimage_builder/elements/pip-and-virtualenv/install.d/pip-and-virtualenv-source-install/04-install-pip
+
+
+
+# Force to add zuul group to be success "|| true"
+# Notes: This element is conflict with "devuser" element
+# ERROR:
+# 2021-01-27 08:37:32.720 | INFO:glean-install:install -D -g root -o root -m 0644 /usr/glean/lib/python3.8/site-packages/glean/init/glean-udev.rules /etc/udev/rules.d/99-glean.rules
+# 2021-01-27 08:37:32.733 | dib-run-parts 50-simple-init completed
+# 2021-01-27 08:37:32.733 | dib-run-parts Running /tmp/in_target.d/install.d/60-simple-init-remove-interfaces
+# 2021-01-27 08:37:32.736 | + set -eu
+# 2021-01-27 08:37:32.737 | + set -o pipefail
+# 2021-01-27 08:37:32.737 | + rm -f '/etc/sysconfig/network-scripts/ifcfg-eth*'
+# 2021-01-27 08:37:32.738 | + rm -f '/etc/sysconfig/network-scripts/ifcfg-en*'
+# 2021-01-27 08:37:32.740 | + rm -f '/etc/sysconfig/network/ifcfg-eth*'
+# 2021-01-27 08:37:32.741 | + rm -f '/etc/sysconfig/network/ifcfg-en*'
+# 2021-01-27 08:37:32.742 | + rm -f '/etc/network/interfaces.d/eth*'
+# 2021-01-27 08:37:32.744 | + rm -f '/etc/network/interfaces.d/en*'
+# 2021-01-27 08:37:32.745 | + rm -f '/etc/conf.d/net*'
+# 2021-01-27 08:37:32.747 | + '[' -f /etc/network/interfaces ']'
+# 2021-01-27 08:37:32.747 | + printf 'auto lo\niface lo inet loopback\n\n'
+# 2021-01-27 08:37:32.747 | + '[' -d /etc/network/interfaces.d/ ']'
+# 2021-01-27 08:37:32.747 | + '[' ubuntu == ubuntu ']'
+# 2021-01-27 08:37:32.748 | + '[' focal == trusty ']'
+# 2021-01-27 08:37:32.748 | + printf 'source /etc/network/interfaces.d/*\n\n'
+# 2021-01-27 08:37:32.750 | dib-run-parts 60-simple-init-remove-interfaces completed
+# 2021-01-27 08:37:32.750 | dib-run-parts Running /tmp/in_target.d/install.d/60-zuul-worker
+# 2021-01-27 08:37:32.754 | + set -eu
+# 2021-01-27 08:37:32.754 | + set -o pipefail
+# 2021-01-27 08:37:32.755 | + groupadd zuul
+# 2021-01-27 08:37:32.757 | groupadd: group 'zuul' already exists
+# 
+# vi /home/ubuntu/nodepool/elements/zuul-worker/install.d/60-zuul-worker    "|| true"
+
+
+openstack --os-cloud citynetwork server delete test2 ; openstack --os-cloud citynetwork image delete openlab-ubuntu-focal ; rm -rf ubuntu-focal-amd64* ; scp -r ubuntu@192.168.0.17:/home/ubuntu//diskimage-builder/ubuntu-focal-amd64.qcow2 . ; scp -r  ubuntu@192.168.0.17:/home/ubuntu//diskimage-builder/ubuntu-focal-amd64.qcow2.md5 . ; scp -r  ubuntu@192.168.0.17:/home/ubuntu//diskimage-builder/ubuntu-focal-amd64.qcow2.sha256 . ; scp -r ubuntu@192.168.0.17:/home/ubuntu//diskimage-builder/ubuntu-focal-amd64.d . ; openstack --os-cloud citynetwork image create openlab-ubuntu-focal --disk-format qcow2 --file ./ubuntu-focal-amd64.qcow2 --private ; openstack --os-cloud citynetwork image list | grep openlab ; openstack --os-cloud citynetwork image list | grep openlab ; openstack --os-cloud citynetwork server create test2 --flavor 2C-4GB-50GB --image openlab-ubuntu-focal --network d0d972fa-6e89-4605-a9ff-57a520e13750 ; openstack --os-cloud citynetwork server list
