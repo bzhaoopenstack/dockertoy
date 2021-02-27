@@ -1,0 +1,38 @@
+    1  yum update
+    2  cd
+    4  yum install wget -y
+    5  wget http://mirror.centos.org/centos/8-stream/AppStream/aarch64/os/Packages/postgresql-13.2-1.module_el8.4.0+701_c3c42fce.aarch64.rpm
+    6  wget http://mirror.centos.org/centos/8-stream/AppStream/aarch64/os/Packages/postgresql-13.2-1.module_el8.4.0+701_c3c42fce.aarch64.rpm
+    7  wget http://mirror.centos.org/centos/8-stream/AppStream/aarch64/os/Packages/postgresql-13.2-1.module_el8.4.0+701+c3c42fce.aarch64.rpm
+    8  yum install rpmspec
+    9  rpmquery --help
+   10  yum install rpm
+   11  yum search rpm
+   12  yum search rpmspec
+   13  yum install rpm-*
+   14  rpmspec --help
+   15  ls
+   16  rpmspec -Pq postgresql-13.2-1.module_el8.4.0+701+c3c42fce.aarch64.rpm
+   17  rpmspec -Pq --builtrpms postgresql-13.2-1.module_el8.4.0+701+c3c42fce.aarch64.rpm
+   18  rpmspec -Pq --builtrpms ./postgresql-13.2-1.module_el8.4.0+701+c3c42fce.aarch64.rpm
+   19  rpm -qp postgresql-13.2-1.module_el8.4.0+701+c3c42fce.aarch64.rpm
+   20  rpm -qp postgresql-13.2-1.module_el8.4.0+701+c3c42fce.aarch64.rpm
+   21  rpm --help
+   22  rpmspec -Pq --builtrpms ./postgresql-13.2-1.module_el8.4.0+701+c3c42fce.aarch64.rpm
+   23  rpmspec --help
+   24  rpmspec -P --builtrpms ./postgresql-13.2-1.module_el8.4.0+701+c3c42fce.aarch64.rpm
+   25  rpm -qp --scripts ./postgresql-13.2-1.module_el8.4.0+701+c3c42fce.aarch64.rpm
+   26  wget https://download.postgresql.org/pub/repos/yum/13/redhat/rhel-8-aarch64/postgresql13-13.0-1PGDG.rhel8.aarch64.rpm
+   27  rpm -qp --scripts ./postgresql13-13.0-1PGDG.rhel8.aarch64.rpm
+   28  rpmspec -P --builtrpms ./postgresql13-13.0-1PGDG.rhel8.aarch64.rpm
+   29  rpmspec --help
+   30  rpmspec -P -q ./postgresql13-13.0-1PGDG.rhel8.aarch64.rpm
+   31  rpm -qp --scripts ./postgresql13-13.0-1PGDG.rhel8.aarch64.rpm
+   32   wget https://download.postgresql.org/pub/repos/yum/srpms/13/redhat/rhel-8-aarch64/postgresql13-13.0-1PGDG.rhel8.src.rpm
+   33  rpm -qp --scripts ./postgresql13-13.0-1PGDG.rhel8.src.rpm
+   34  rpm2cpio ./postgresql13-13.0-1PGDG.rhel8.src.rpm | cpio -civ test.spec
+   35  vi test
+   36  ls
+   37  rpm2cpio ./postgresql13-13.0-1PGDG.rhel8.src.rpm | cpio -civ '*.spec'
+   38  ls
+   39  vi postgresql-13.spec
