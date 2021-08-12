@@ -16,6 +16,29 @@ df -TH
 ### yum update后如果软件仓库有内核更新，需要reboot重启才会生效。
 
 
+##### 可选.拓展swap space避免arm OOM issue
+# free -m查看内存和swap分区
+# https://www.jianshu.com/p/04c7a9ab438c
+# 创建swap文件
+cd /var
+mkdir swap
+dd if=/dev/zero of=swapfile bs=1024 count=4000000
+# count代表的是大小，我这里是4G。
+
+# 把文件转换为swap文件，在 var目录执行
+mkswap swapfile
+
+# 激活swap文件
+# 这里可以直接用命令挂载上一个swap分区，但是重启后要重新挂载：
+# 挂载： 挂载好后可以free -m查看
+swapon /var/swapfile
+# 如果不需要了，可以也可以卸载：
+# 卸载：sudo swapoff /var/swapfile
+# 如果需要开机启动后自动挂载的话，可以把它添加到/etc/fstab文件中。
+# 开机自动挂载SWAP分区， 编辑   /etc/fstab，末行添加：
+# 在文件中增加如下：
+# /var/swapfile   swap  swap  defaults  0  0
+
 ##### 2.构造目录结构
 cd /opt/
 mkdir kernels
