@@ -26,14 +26,14 @@ cd ..
 
 # 下载oe rpm包项目，安装所需依赖
 mkdir src-openeuler
-
+cd src-openeuler
 git clone https://gitee.com/src-openeuler/mariadb
 
 cd mariadb
 
 yum-builddep ./mariadb.spec -y
 
-cd ..
+cd ../..
 
 
 
