@@ -103,4 +103,6 @@ cd mysql-sbench
 
 bash -x ./vm.sh | tee ~/log
 
-
+# Others:
+# 启动 tcmalloc or jemalloc优化内存分配
+# https://rmnaveed.co.uk/mysql-and-memory-allocators-malloc-tcmalloc-and-jemalloc/
