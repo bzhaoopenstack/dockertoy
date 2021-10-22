@@ -12,6 +12,46 @@ do
 	yum install $var -y
 done
 
+# ubuntu
+apt-get -q update \
+    && apt-get -q install -y --no-install-recommends \
+        build-essential \
+        ccache \
+        libevent-dev \
+        libapr1-dev \
+        libffi-dev \
+        libssl-dev \
+        git \
+        python-pip \
+        python-dev \
+        gcc \
+        libsodium-dev \
+        libcurl4-openssl-dev \
+        libzstd1-dev \
+        libldap2-dev \
+        flex \
+        libbz2-dev \
+        bison \
+        libpq-dev \
+        postgresql-server-dev-all \
+        postgresql-common \
+        libyaml-dev \
+        zlib1g \
+        zlib1g-dev \
+        sudo \
+        vim \
+        net-tools \
+        less \
+        iputils-ping \
+        iproute2 \
+        ssh \
+        locales \
+        locales-all \
+        wget
+apt install libreadline-dev libkrb5-dev libxml2-dev libxerces-c-dev -y
+# -- ubuntu
+
+
 ln -s /usr/bin/python2 /usr/bin/python
 
 cd gpdb
@@ -96,16 +136,18 @@ passwd gpadmin
 mkdir /usr/local/greenplum
 chown -R gpadmin:gpadmin /usr/local/greenplum/
 
+cd ~/gpdb/gpdb_src
 cp -rf  ./greenplum-db-6.7.0/* /usr/local/greenplum/
 chown -R gpadmin:gpadmin /usr/local/greenplum/*
 
 
 su gpadmin
+cd
 ssh-keygen -t rsa
 
-ssh-copy-id gpdb01
-ssh-copy-id gpdb02
-ssh-copy-id gpdb03
+ssh-copy-id -f -i ~/.ssh/id_rsa.pub gpdb01
+ssh-copy-id -f -i ~/.ssh/id_rsa.pub gpdb02
+ssh-copy-id -f -i ~/.ssh/id_rsa.pub gpdb03
 
 
 mkdir /home/gpadmin/conf
@@ -229,6 +271,7 @@ cp /home/gpadmin/conf/seg_hosts /home/gpadmin/gpconfigs/hostfile_gpinitsystem
 
 # master上初始化gpdb
 cd ~
+mkdir -p /home/gpadmin/data/master
 gpinitsystem -c gpconfigs/gpinitsystem_config -h gpconfigs/hostfile_gpinitsystem
 
 # 验证
