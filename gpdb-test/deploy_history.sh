@@ -287,3 +287,53 @@ psql -d postgres
 #(1 row)
 
 # - master
+
+# 在开始测试前，因为测试环境为云上环境，但是gpdb的内部通信默认为udp方式，云上不支持大二层通信，需要将该方式修改为tcp模式，所有节点都需要更改，否则只在master节点通过终端修改不会生效，然后重启整个集群生效。
+# master 
+# ~/data/master/gpseg-1/postgresql.conf
+# 配置文件路径均与上方配置文件对应
+# gp_interconnect_type=udpifc
+gp_interconnect_type=tcp
+# - master
+
+# segments
+# ~/data/mirror/gpseg1/postgresql.conf
+# ~/data/primary/gpseg0/postgresql.conf
+# gp_interconnect_type=udpifc
+gp_interconnect_type=tcp
+# - segments
+
+# 最终在master重启集群
+gpstop -r
+
+
+# 在master上开始测试 
+cd
+git clone https://gitee.com/pf-qiu/gpdb-tpcds
+
+
+cd gpdb-tpcds
+# 编译用例生成工具
+cd tools
+make
+
+cd ../gpdb
+
+# 在本目录下的./gen.sh 更改模拟的数据量大小，以GB为单位。
+# 测试数据生成
+./gen.sh
+
+# 创建数据库，执行schema.sql
+createdb
+psql -f schema.sql
+
+# 测试加载dbgen_version表
+./load_data.sh dbgen_version
+
+# 加载全部数据
+./load_all.sh
+
+# 运行测试
+# notes: 95 query时间太长，暂时去掉，需要修改run_all.sh脚本
+# 另外，对于iterations.sh脚本也需要更改相应生成报表路径，更改为./summary/*.dat
+rm -rf ../data/* ; ./gen.sh ; createdb ; psql -f schema.sql ; ./load_data.sh dbgen_version ; ./load_all.sh ; sed -i "1 i\set optimizer = 'off';" ../data/*.sql ; ./run_iterations.sh 3
