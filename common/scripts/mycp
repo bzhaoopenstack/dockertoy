@@ -1,0 +1,17 @@
+root@minikube:/# cat mycp 
+#!/usr/bin/bash
+
+mkdir res
+j=0
+for i in `cat ./1`; do
+    echo "$j --- $j"
+    #echo "$i"
+    let "j+=1"
+
+    thisname=$i
+    filename=`echo $i | sed "s#/#*#g" | sed "s#:#9#" `
+    docker save $i -o $filename.tar
+    mv $filename.tar res/
+done
+
+echo "see the res dir for all stored docker images"
