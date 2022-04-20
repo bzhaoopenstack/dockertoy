@@ -1,0 +1,30 @@
+#!/bin/bash -ex
+
+# out of docker env
+
+#rm -rf ./flink-1.15-SNAPSHOT
+rm -rf flink-1.16-SNAPSHOT
+cp -rf ../sync/myrepo/flink/flink-dist/target/flink-1.16-SNAPSHOT-bin/flink-1.16-SNAPSHOT .
+cp ./flink-conf.yaml ./flink-1.16-SNAPSHOT/conf/
+cp ./config.sh ./flink-1.16-SNAPSHOT/bin/
+#cp ./kubernetes-* ./flink-1.16-SNAPSHOT/bin/
+#cp ./kubernetes-jobmanager.sh ./flink-1.16-SNAPSHOT/bin/
+#cp ./kubernetes-taskmanager.sh ./flink-1.16-SNAPSHOT/bin/
+#cp ./kubernetes-session.sh ./flink-1.16-SNAPSHOT/bin/
+#cp ./flink ./flink-1.16-SNAPSHOT/bin/
+
+find ./flink-1.16-SNAPSHOT/ -type f  | xargs dos2unix
+chmod -R 777 ./flink-1.16-SNAPSHOT
+
+sudo ip add add 172.17.0.1/24 dev docker0
+
+docker build -t apache/flink:my-test . 
+#docker tag apache/flink:my-test apache/flink:latest
+
+
+sudo ip add del 172.17.0.1/24 dev docker0
+
+# Now we build success in local docker with image name 'apache/flink:latest'
+# But if you want to use it on another docker which run in another cluster, you need to run this image first with docker run in local host, then docker export the whole filesystem to a tar file in local host. After that, you can copy this tar package to another cluster via docker cp or any other ways, once you login another docker env, you can docker import the tar package into that docker env there. COMPLETE.
+# DO NOT FORGET TO RUN THE DOCKER IMAGE FIRST, THEN EXPORT THAT RUNNING CONTAINER TO TAR PACKAGE
+echo "NOTE!! -- DO NOT FORGET TO RUN THE DOCKER IMAGE FIRST, THEN EXPORT THAT RUNNING CONTAINER TO TAR PACKAGE"
