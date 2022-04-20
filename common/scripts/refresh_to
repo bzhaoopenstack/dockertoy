@@ -1,0 +1,8 @@
+# in internal docker env
+docker rmi -f apache/flink:latest
+docker rmi -f apache/flink:my-test 
+docker rmi -f flink:user
+docker load -i ./tt.tar
+docker tag apache/flink:my-test apache/flink:latest 
+docker tag apache/flink:my-test flink:user
+rm -rf tt.tar
