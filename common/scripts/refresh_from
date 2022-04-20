@@ -1,0 +1,5 @@
+# outside docker env
+rm -rf tt.tar
+docker rmi -f apache/flink:my-test
+./letsgo-mytest2 
+docker save apache/flink:my-test -o tt.tar ; docker cp ./tt.tar a85251677861:/
