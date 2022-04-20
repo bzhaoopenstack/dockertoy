@@ -1,0 +1,13 @@
+# the stored docker images dir
+cd res/
+
+fuck=0
+
+for x in `ls`; do
+    echo "$fuck $x"
+    let "fuck+=1"
+    filename=$x
+    imagename=`echo $x | sed "s#*#/#g" | sed "s#9#:#g" | sed "s#.tar##g"`
+    echo "LOAD ----- $imagename"
+    docker load -i $filename
+done
