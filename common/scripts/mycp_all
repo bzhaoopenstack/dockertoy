@@ -1,0 +1,103 @@
+实现：
+
+line='log format="%o [%a] %m %P (%u) %f %l\""'
+eval $(echo $line |awk -F "=" '{gsub("\\\\","\\\\");gsub("\"","\\\"");print "k=\""$1"\";v=\""$2"\""}')
+echo $k
+echo $v
+说明：
+
+$line为要进行分割的字符串。
+
+awk的-F选项用于指定分隔符。
+
+gsub用于替换字符反斜杠“\”和双引号“"”。
+
+print输出的实际上是赋值语句，k、v为变量名，$1、$2是分割后的子串（索引从1开始）。可定义任意数量的变量。
+
+eval用于执行print输出的赋值语句。
+————————————————
+版权声明：本文为CSDN博主「_荣耀之路_」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/asty9000/article/details/89319054
+
+
+
+wurstmeister/kafka:2.12-2.2.1-k8s 
+nginx:latest         
+volcanosh/vc-webhook-manager:latest         
+volcanosh/vc-scheduler:latest         
+volcanosh/vc-controller-manager:latest         
+gcr.io/k8s-minikube/storage-provisioner:v5             
+k8s.gcr.io/kube-proxy:v1.20.2        
+k8s.gcr.io/kube-controller-manager:v1.20.2        
+k8s.gcr.io/kube-apiserver:v1.20.2        
+k8s.gcr.io/kube-scheduler:v1.20.2        
+kubernetesui/dashboard:v2.1.0         
+nginx:1.19.5         
+k8s.gcr.io/etcd:3.4.13-0       
+jark/demo-sql-client:0.2            
+jark/mysql-example:0.2            
+jark/datagen:0.2            
+k8s.gcr.io/coredns:1.7.0          
+kubernetesui/metrics-scraper:v1.0.4         
+k8s.gcr.io/pause:3.2            
+docker.elastic.co/elasticsearch/elasticsearch:7.6.0          
+wurstmeister/kafka:2.12-2.2.1     
+wurstmeister/zookeeper:3.4.6          
+
+cat > tmpfile
+
+#!/usr/bin/bash
+
+j=0
+mkdir allres
+
+## docker images | grep -v flink | grep -v CREATED | awk '{print "k=\""$1"\";v=\""$2"\""}'
+
+# docker images | grep -v flink | grep -v CREATED > tmpfile
+
+for line in `cat tmpfile`; do
+	echo $line
+	eval $(echo $line |awk -F ":" '{print "k=\""$1"\";v=\""$2"\""}')
+	
+    echo "$j --- $k : $v"
+    #echo "$i"
+    let "j+=1"
+    echo $k
+    echo $v
+
+    thisname=$k
+    filename=`echo $k | sed "s#/#*#g"`
+	filename=$filename$v
+	echo $filename.tar
+    docker save $k:$v -o $filename.tar
+    mv $filename.tar allres/
+done
+
+# rm tmpfile
+echo "see the allres dir for all stored docker images"
+
+
+
+
+wurstmeister/kafka:2.12-2.2.1-k8s 
+nginx:latest         
+volcanosh/vc-webhook-manager:latest         
+volcanosh/vc-scheduler:latest         
+volcanosh/vc-controller-manager:latest         
+gcr.io/k8s-minikube/storage-provisioner:v5             
+k8s.gcr.io/kube-proxy:v1.20.2        
+k8s.gcr.io/kube-controller-manager:v1.20.2        
+k8s.gcr.io/kube-apiserver:v1.20.2        
+k8s.gcr.io/kube-scheduler:v1.20.2        
+kubernetesui/dashboard:v2.1.0         
+nginx:1.19.5         
+k8s.gcr.io/etcd:3.4.13-0       
+jark/demo-sql-client:0.2            
+jark/mysql-example:0.2            
+jark/datagen:0.2            
+k8s.gcr.io/coredns:1.7.0          
+kubernetesui/metrics-scraper:v1.0.4         
+k8s.gcr.io/pause:3.2            
+docker.elastic.co/elasticsearch/elasticsearch:7.6.0          
+wurstmeister/kafka:2.12-2.2.1     
+wurstmeister/zookeeper:3.4.6          
